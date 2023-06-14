@@ -19,6 +19,7 @@ export function getPosts({ token }) {
       return response.json();
     })
     .then((data) => {
+      console.log(data.posts[0]);
       return data.posts;
     });
 }
