@@ -66,6 +66,30 @@ export function uploadImage({ file }) {
     method: "POST",
     body: data,
   }).then((response) => {
+    console.log(response.json)
     return response.json();
+  })
+  .then((data) => {
+    console.log(data)
+    console.log(data.fileUrl);
+    return data.fileUrl;
   });
 }
+
+export function onAddPostClick ( {description, imageUrl}) {
+
+  fetch (baseHost, {
+    method: "POST",
+    body: JSON.stringify({
+      description,
+      imageUrl
+    }),
+    headers: {
+      Authorization: token,
+    }
+  })
+  .then((response) => {
+    console.log(response)
+  })
+}
+
