@@ -1,6 +1,8 @@
 import { uploadImage } from "../api.js";
 
 export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
+  let imageUrl = '';
+
   const render = () => {
     // TODO: Реализовать страницу добавления поста
     const appHtml = `
@@ -38,19 +40,19 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
 
     appEl.innerHTML = appHtml;
 
-    
-
     document.getElementById("add-button").addEventListener("click", () => {
 
-      const imageDescription = document.querySelector('.textarea');
+      const imageDescription = document.querySelector('.textarea').value;
       const fileInputElement = document.querySelector('.file-upload-input');
-      uploadImage({ file: fileInputElement.files[0] });
-      console.log(data.fileUrl)
+      uploadImage({ file: fileInputElement.files[0] }).then((data) => {
+        imageUrl = data.dileUrl;
+        return imageUrl;
+      });;
 
-      // onAddPostClick({
-      //   description: imageDescription.value,
-      //   imageUrl: data.fileUrl,
-      // });
+      onAddPostClick({
+        description: imageDescription,
+        imageUrl: imageUrl,
+      });
     });
   };
 

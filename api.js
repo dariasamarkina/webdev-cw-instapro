@@ -69,27 +69,23 @@ export function uploadImage({ file }) {
     console.log(response.json)
     return response.json();
   })
-  .then((data) => {
-    console.log(data)
-    console.log(data.fileUrl);
-    return data.fileUrl;
-  });
+  
 }
 
-export function onAddPostClick ( {description, imageUrl}) {
+export function sendPost (token, post) {
 
-  fetch (baseHost, {
+  fetch (postsHost, {
     method: "POST",
-    body: JSON.stringify({
-      description,
-      imageUrl
-    }),
+    body: JSON.stringify(post),
     headers: {
       Authorization: token,
     }
   })
   .then((response) => {
-    console.log(response)
+    if (response.status === 401) {
+      throw new Error('Нет авторизации');
+    };
+    console.log(response);
   })
 }
 
