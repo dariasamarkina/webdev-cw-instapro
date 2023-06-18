@@ -88,4 +88,3 @@ export function sendPost (token, post) {
     console.log(response);
   })
 }
-
