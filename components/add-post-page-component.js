@@ -1,6 +1,8 @@
 import { uploadImage } from "../api.js";
+import { renderUploadImageComponent } from "./upload-image-component.js";
 
 export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
+
   let imageUrl = '';
 
   const render = () => {
@@ -40,14 +42,17 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
 
     appEl.innerHTML = appHtml;
 
+    renderUploadImageComponent({
+      element: appEl.querySelector('.upload-image-container'),
+      onImageUrlChange(newImageUrl) {
+        imageUrl = newImageUrl;
+      },
+    });
+
     document.getElementById("add-button").addEventListener("click", () => {
 
       const imageDescription = document.querySelector('.textarea').value;
-      const fileInputElement = document.querySelector('.file-upload-input');
-      uploadImage({ file: fileInputElement.files[0] }).then((data) => {
-        imageUrl = data.dileUrl;
-        return imageUrl;
-      });;
+      // const fileInputElement = document.querySelector('.file-upload-input');
 
       onAddPostClick({
         description: imageDescription,
