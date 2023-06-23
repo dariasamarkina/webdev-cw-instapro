@@ -1,14 +1,16 @@
 // Замени на свой, чтобы получить независимый от других набор данных.
 // "боевая" версия инстапро лежит в ключе prod
+import { getToken } from './index.js';
+
 const personalKey = "prod";
 const baseHost = "https://webdev-hw-api.vercel.app";
 const postsHost = `${baseHost}/api/v1/${personalKey}/instapro`;
 
-export function getPosts({ token }) {
+export function getPosts() {
   return fetch(postsHost, {
     method: "GET",
     headers: {
-      Authorization: token,
+      Authorization: getToken(),
     },
   })
     .then((response) => {
@@ -20,6 +22,25 @@ export function getPosts({ token }) {
     })
     .then((data) => {
       console.log(data.posts[0]);
+      return data.posts;
+    });
+}
+
+export function getUserPosts(id) {
+  return fetch(`${postsHost}/user-posts/${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: getToken(),
+    },
+  })
+    .then((response) => {
+      if (response.status === 401) {
+        throw new Error("Нет авторизации");
+      }
+
+      return response.json();
+    })
+    .then((data) => {
       return data.posts;
     });
 }
@@ -66,26 +87,59 @@ export function uploadImage({ file }) {
     method: "POST",
     body: data,
   }).then((response) => {
-    console.log(response.json)
     return response.json();
   })
-  
 }
 
-export function sendPost (token, post) {
+export function addPost({ description, imageUrl }) {
 
-  fetch (postsHost, {
+  fetch(postsHost, {
     method: "POST",
-    body: JSON.stringify(post),
+    body: JSON.stringify({
+      description,
+      imageUrl,
+    }),
     headers: {
-      Authorization: token,
+      Authorization: getToken(),
     }
   })
-  .then((response) => {
+    .then((response) => {
+
+      if (response.status === 401) {
+        throw new Error('Нет авторизации');
+      };
+
+      console.log(response);
+      return response.json();
+    })
+}
+
+export function addLike (likedPostId) {
+  return fetch(`${postsHost}/${likedPostId}/like`, {
+    method: 'POST',
+    headers: {
+      Authorization: getToken(),
+    },
+  }).then((response) => {
     if (response.status === 401) {
-      throw new Error('Нет авторизации');
-    };
-    console.log(response);
+      throw new Error ('Нет авторизации');
+    }
+    console.log('like');
+    return response.json();
   })
 }
 
+export function removeLike (likedPostId) {
+  return fetch(`${postsHost}/${likedPostId}/dislike`, {
+    method: 'POST',
+    headers: {
+      Authorization: getToken(),
+    },
+  }).then((response) => {
+    if (response.status === 401) {
+      throw new Error ('Нет авторизации');
+    }
+    console.log('dislike');
+    return response.json();
+  })
+}
