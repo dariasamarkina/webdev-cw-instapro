@@ -1,6 +1,7 @@
 import { USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
 import { posts, goToPage } from "../index.js";
+import { addLike, removeLike } from "../api.js";
 
 export function renderPostsPageComponent({ appEl }) {
   // TODO: реализовать рендер постов из api
@@ -26,7 +27,7 @@ export function renderPostsPageComponent({ appEl }) {
                     </div>
                     <div class="post-likes">
                       <button data-post-id=${post.id} class="like-button">
-                        <img src="./assets/images/like-active.svg">
+                        <img data-post-id=${post.id} data-isliked=${post.isLiked} src="./assets/images/like${post.isLiked ? '-active' : '-not-active'}.svg"-active.svg">
                       </button>
                       <p class="post-likes-text">
                         Нравится: <strong>${post.likes.length}</strong>
@@ -45,6 +46,46 @@ export function renderPostsPageComponent({ appEl }) {
             </div>
     `
   }).join("");
+
+  appEl.innerHTML = postsHtml;
+
+  renderHeaderComponent({
+    element: document.querySelector(".header-container"),
+  });
+
+  for (let userEl of document.querySelectorAll(".post-header")) {
+    userEl.addEventListener("click", () => {
+      goToPage(USER_POSTS_PAGE, {
+        userId: userEl.dataset.userId,
+      });
+    });
+  }
+
+  for (let like of document.querySelectorAll('.like-button')) {
+      like.addEventListener('click', (event) => {
+        const target = event.target;
+        const likedPostId = target.dataset.postId;
+        const isPostLiked = target.dataset.isliked;
+        const value = target.parentElement.nextElementSibling.firstChild.nextSibling;
+
+        if (isPostLiked === 'true') {
+          removeLike(likedPostId).then((data) => {
+            console.log(data);
+            target.dataset.isliked = false;
+            target.src = './assets/images/like-not-active.svg';
+            value.textContent = +value.textContent - 1;
+          })
+        } else {
+          addLike(likedPostId).then((data) => {
+            console.log(data);
+            target.dataset.isliked = true;
+            target.src = './assets/images/like-active.svg';
+            value.textContent = +value.textContent + 1;
+          })
+        } 
+    })
+  }
+  
 
   // const appHtml = `
   //             <div class="page-container">
@@ -129,17 +170,5 @@ export function renderPostsPageComponent({ appEl }) {
   //               </ul>
   //             </div>`;
 
-  appEl.innerHTML = postsHtml;
 
-  renderHeaderComponent({
-    element: document.querySelector(".header-container"),
-  });
-
-  for (let userEl of document.querySelectorAll(".post-header")) {
-    userEl.addEventListener("click", () => {
-      goToPage(USER_POSTS_PAGE, {
-        userId: userEl.dataset.userId,
-      });
-    });
-  }
 }

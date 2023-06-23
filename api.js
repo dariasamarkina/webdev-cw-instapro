@@ -110,6 +110,36 @@ export function addPost({ description, imageUrl }) {
       };
 
       console.log(response);
-      return response.json;
+      return response.json();
     })
+}
+
+export function addLike (likedPostId) {
+  return fetch(`${postsHost}/${likedPostId}/like`, {
+    method: 'POST',
+    headers: {
+      Authorization: getToken(),
+    },
+  }).then((response) => {
+    if (response.status === 401) {
+      throw new Error ('Нет авторизации');
+    }
+    console.log('like');
+    return response.json();
+  })
+}
+
+export function removeLike (likedPostId) {
+  return fetch(`${postsHost}/${likedPostId}/dislike`, {
+    method: 'POST',
+    headers: {
+      Authorization: getToken(),
+    },
+  }).then((response) => {
+    if (response.status === 401) {
+      throw new Error ('Нет авторизации');
+    }
+    console.log('dislike');
+    return response.json();
+  })
 }

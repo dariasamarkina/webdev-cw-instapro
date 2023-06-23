@@ -1,10 +1,11 @@
 import { USER_POSTS_PAGE } from '../routes.js';
 import { renderHeaderComponent } from "./header-component.js";
 import { posts, goToPage } from '../index.js';
+import { addLike, removeLike } from "../api.js";
 
 export function renderUserPostsPage ( { appEl }) {
 
-    console.log(posts);
+    console.log('Посты пользователя ', posts);
 
     const userPostsHtml = posts.map((post) => {
         return `
@@ -21,7 +22,7 @@ export function renderUserPostsPage ( { appEl }) {
                         </div>
                         <div class="post-likes">
                           <button data-post-id=${post.id} class="like-button">
-                            <img src="./assets/images/like-active.svg">
+                            <img data-post-id=${post.id} data-isliked=${post.isLiked} src="./assets/images/like-active.svg">
                           </button>
                           <p class="post-likes-text">
                             Нравится: <strong>${post.likes.length}</strong>
@@ -54,4 +55,30 @@ export function renderUserPostsPage ( { appEl }) {
           });
         });
       }
+
+      for (let like of document.querySelectorAll('.like-button')) {
+        like.addEventListener('click', (event) => {
+          const target = event.target;
+          const likedPostId = target.dataset.postId;
+          const isPostLiked = target.dataset.isliked;
+          const value = target.parentElement.nextElementSibling.firstChild.nextSibling;
+  
+          if (isPostLiked === 'true') {
+            removeLike(likedPostId).then((data) => {
+              console.log(data);
+              target.dataset.isliked = false;
+              target.src = './assets/images/like-not-active.svg';
+              value.textContent = +value.textContent - 1;
+            })
+          } else {
+            addLike(likedPostId).then((data) => {
+              console.log(data);
+              target.dataset.isliked = true;
+              target.src = './assets/images/like-active.svg';
+              value.textContent = +value.textContent + 1;
+            })
+          } 
+  
+      })
+    }
 }
